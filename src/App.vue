@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <el-button>默认按钮</el-button>
-    <!-- 路由出口 -->
-    <router-link to="/">跳转</router-link>
+  <div class="app">
     <router-view></router-view>
   </div>
 </template>
@@ -11,5 +8,6 @@
 export default {};
 </script>
 
-<style>
+<style lang="less">
+// 使用less    lang="less"
 </style>
