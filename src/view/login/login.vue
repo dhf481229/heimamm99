@@ -1,5 +1,5 @@
 <template>
-  <!-- 最外层标签的class名字使用组件名 -->
+  <!-- 最外层标签的class名字使用组件名     -->
   <div class="login">
     <div class="left">
       <div class="title">
