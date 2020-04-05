@@ -11,4 +11,5 @@ export default {};
 
 <style lang="less">
 // 使用less    lang="less"
+@import url(~@/style/base.css);
 </style>
