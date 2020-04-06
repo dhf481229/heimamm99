@@ -15,13 +15,32 @@
            v-model双向绑定表单元素的值
            placeholder
            prefix-icon  input前面图标
-           show-password是否显示密码图标，以点点形式显示           
+           show-password是否显示密码图标，以点点形式显示 
+
+     加入表单验证
+       1：实现基本布局与数据绑定
+       2：在el-form上绑定一个rules属性  rules属性的值要是一个对象（需在data里定义rules的值）
+       3:在需要验证的项的el-form-item上定义一个prop属性，prop的值为该项内表单元素v-model绑定的值
+       4:在rules里写相应项的验证规则
+          [{required:true,message:"手机号必填哦",trigger:"change"}]
+          min:最小值，max:最大值
+
+      登陆的点击校验
+         1.在el-form上定义一个ref  ref="值"
+         2.为登陆按钮绑定一个事件
+         3.调用el-form的表单验证方法
+           this.$refs.form.validate(result=>{
+             result它是一个boolean值，
+             true验证通过
+             false表示 验证不通过
+           })
+                  
       -->
-      <el-form :model="form">
-        <el-form-item>
+      <el-form :model="form" :rules="rules" ref="form">
+        <el-form-item prop="phone">
           <el-input prefix-icon="el-icon-user" v-model="form.phone" placeholder="请输入手机号"></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="password">
           <el-input
             :show-password="true"
             prefix-icon="el-icon-lock"
@@ -33,7 +52,7 @@
              el-row：行
                 它有一个子项是el-col 代表栏 多少栏  :span="栏数"
         -->
-        <el-form-item>
+        <el-form-item prop="code">
           <el-row>
             <el-col :span="16">
               <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
@@ -59,7 +78,7 @@
              type="值"  值决定按钮的颜色
         -->
         <el-form-item>
-          <el-button class="btn" type="primary">登陆</el-button>
+          <el-button class="btn" type="primary" @click="loginClick">登陆</el-button>
           <br />
           <el-button class="btn" type="primary">注册</el-button>
         </el-form-item>
@@ -82,8 +101,37 @@ export default {
         password: "", //密码
         code: "", //验证码
         isCheck: "" //是否同意协议
+      },
+      //表单验证规则
+      rules: {
+        phone: [{ required: true, message: "请输入手机号", trigger: "change" }],
+        password: [
+          { required: true, message: "请输入密码", trigger: "change" },
+          {
+            min: 6,
+            max: 12,
+            message: "请输入6到12位长度密码",
+            trigger: "change"
+          }
+        ],
+        code: [
+          { required: true, message: "请输入验证码", trigger: "change" },
+          {
+            min: 4,
+            max: 4,
+            message: "请正确输入验证码",
+            trigger: "change"
+          }
+        ]
       }
     };
+  },
+  methods: {
+    loginClick() {
+      this.$refs.form.validate(result => {
+        this.$message.success(result + "");
+      });
+    }
   }
 };
 </script>
