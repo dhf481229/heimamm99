@@ -100,7 +100,7 @@ export default {
         phone: "", //手机号
         password: "", //密码
         code: "", //验证码
-        isCheck: "" //是否同意协议
+        isCheck: "" //   是否同意协议
       },
       //表单验证规则
       rules: {
