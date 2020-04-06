@@ -80,19 +80,31 @@
         <el-form-item>
           <el-button class="btn" type="primary" @click="loginClick">登陆</el-button>
           <br />
-          <el-button class="btn" type="primary">注册</el-button>
+          <el-button class="btn" type="primary" @click="registerClick">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="right">
       <img src="@/assets/img/login_banner_ele.png" alt />
     </div>
+    <!-- 组件中套用其它组件
+    1：导入子组件   import 名字 from 路径
+    2:注册   components:{register}
+    3:当标签使用  
+    
+    
+    -->
+    <register ref="register"></register>
   </div>
 </template>
 
 <script>
+import register from "./register.vue";
 export default {
   name: "login",
+  components: {
+    register
+  },
   data() {
     return {
       //表单绑定的值
@@ -127,10 +139,18 @@ export default {
     };
   },
   methods: {
+    // 登陆点击
     loginClick() {
       this.$refs.form.validate(result => {
         this.$message.success(result + "");
       });
+    },
+    // 注册点击
+    registerClick() {
+      // 打开register里的弹窗组件
+      // 1：在register组件 上定义一个ref属性  ref=值
+      //2：通过this.$refs.值.dialogFormVisible=true
+      this.$refs.register.dialogFormVisible = true;
     }
   }
 };
