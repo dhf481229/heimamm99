@@ -138,6 +138,9 @@ export default {
       }
     };
   },
+  mounted() {
+    alert(process.env.VUE_APP_URL);
+  },
   methods: {
     // 登陆点击
     loginClick() {
@@ -156,7 +159,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .login {
   // 弹性盒子布局
   display: flex;

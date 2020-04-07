@@ -19,7 +19,7 @@ export default {
   }
 };
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .register {
   .title {
     height: 53px;
@@ -28,6 +28,10 @@ export default {
     text-align: center;
     line-height: 53px;
   }
+}
+</style>
+<style lang="less">
+.register {
   .el-dialog__header {
     padding: 0;
   }
