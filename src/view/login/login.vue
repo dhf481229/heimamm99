@@ -138,9 +138,7 @@ export default {
       }
     };
   },
-  mounted() {
-    alert(process.env.VUE_APP_URL);
-  },
+  mounted() {},
   methods: {
     // 登陆点击
     loginClick() {
