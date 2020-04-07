@@ -66,7 +66,19 @@
             <el-input v-model="form.code"></el-input>
           </el-col>
           <el-col :span="7" :offset="1">
-            <img class="code" src="@/assets/img/key.jpg" alt />
+            <!-- 点击 验证码切换，改变它的url地址就可以了，加个随机数就可以了-->
+            <img class="code" :src="codeUrl" @click="changeCodeUrl" alt />
+          </el-col>
+        </el-row>
+      </el-form-item>
+      <!-- 验证码 -->
+      <el-form-item label="验证码" prop="rcode">
+        <el-row>
+          <el-col :span="16">
+            <el-input v-model="form.rcode"></el-input>
+          </el-col>
+          <el-col :span="7" :offset="1">
+            <el-button @click="getRecode">获取验证码</el-button>
           </el-col>
         </el-row>
       </el-form-item>
@@ -79,10 +91,13 @@
   </el-dialog>
 </template>
 <script>
+import getPhoneCode from "@/api/register.js";
 export default {
   data() {
     return {
       dialogFormVisible: false,
+      // 图形验证码
+      codeUrl: process.env.VUE_APP_URL + "/captcha?type=sendsms",
       // 表单数据
       form: {
         // 头像地址,我们注册功能需要提交的数据
@@ -91,7 +106,8 @@ export default {
         email: "", //邮箱
         phone: "", //手机
         password: "", //手机
-        code: "" //验证码
+        code: "", //图形验证码
+        rcode: "" //手机验证码
       },
       // 表单验证规则绑定
       rules: {
@@ -146,6 +162,10 @@ export default {
         code: [
           { required: true, message: "请输入验证码", trigger: "change" },
           { min: 4, max: 4, message: "请输入4位验证码", trigger: "change" }
+        ],
+        rcode: [
+          { required: true, message: "请输入验证码", trigger: "change" },
+          { min: 4, max: 4, message: "请输入4位验证码", trigger: "change" }
         ]
       },
       baseUrl: process.env.VUE_APP_URL,
@@ -190,6 +210,46 @@ export default {
       this.$refs.form.validate(result => {
         window.console.log(result);
       });
+    },
+    // 点击切换验证码
+    changeCodeUrl() {
+      this.codeUrl =
+        process.env.VUE_APP_URL + "/captcha?type=sendsms&t=" + Date.now();
+    },
+    // 点击获取手机验证码
+    getRecode() {
+      // 访问el-form上的validateField该方法
+      //该方法有二个参数，
+      // 第一个是要验证的项,支持string|array  该项的值就是prop的值
+      // 第二个参数是一个function function的参数是验证时的错误信息返回，当返回信息为空（没有错误），表示验证通过，不为空验证不通过
+      // 需求是二次都通过才行
+      let _pass = true;
+      this.$refs.form.validateField(["code", "phone"], error => {
+        if (error != "") {
+          _pass = false;
+        }
+      });
+      if (_pass === false) {
+        return;
+      } else {
+        // 调用接口获取验证码
+        // axios({
+        //   url: process.env.VUE_APP_URL + "/sendsms",
+        //   method: "post",
+        //   data: {
+        //     code: this.form.code,
+        //     phone: this.form.phone
+        //   },
+        //   withCredentials: true //跨域照样协带cookie
+        // })
+        getPhoneCode({
+          code: this.form.code,
+          phone: this.form.phone
+        }).then(res => {
+          this.$message.success(res.data.data.captcha + "");
+          window.console.log(res);
+        });
+      }
     }
   }
 };
