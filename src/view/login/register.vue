@@ -11,8 +11,8 @@
       label-width标题栏的宽度 
       label:标题
     -->
+    <div slot="title" class="title">用户注册</div>
     <el-form :model="form" label-width="100px" ref="form" :rules="rules">
-      <div slot="title" class="title">用户注册</div>
       <!-- 给头像加入表单验证 -->
       <el-form-item label="头像" prop="avatar">
         <!-- 上传东西
@@ -40,6 +40,36 @@
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
+      <!-- 昵称 -->
+      <el-form-item label="昵称" prop="username">
+        <el-input v-model="form.username"></el-input>
+      </el-form-item>
+      <!-- 邮箱  -->
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="form.email"></el-input>
+      </el-form-item>
+      <!-- 手机  -->
+      <el-form-item label="手机号" prop="phone">
+        <el-input v-model="form.phone"></el-input>
+      </el-form-item>
+      <!-- 密码  -->
+      <el-form-item label="密码" prop="password">
+        <el-input v-model="form.password" :show-password="true"></el-input>
+      </el-form-item>
+      <!-- 图形码 
+      el-row  行
+      el-col  列  :span="值1" :offset="值2"   offset左移偏移栏数
+      -->
+      <el-form-item label="图形码" prop="code">
+        <el-row>
+          <el-col :span="16">
+            <el-input v-model="form.code"></el-input>
+          </el-col>
+          <el-col :span="7" :offset="1">
+            <img class="code" src="@/assets/img/key.jpg" alt />
+          </el-col>
+        </el-row>
+      </el-form-item>
     </el-form>
     <!-- 加一个确定按钮 -->
     <div slot="footer" class="center">
@@ -55,16 +85,71 @@ export default {
       dialogFormVisible: false,
       // 表单数据
       form: {
-        // 头像地址
-        avatar: ""
+        // 头像地址,我们注册功能需要提交的数据
+        avatar: "",
+        username: "", //昵称
+        email: "", //邮箱
+        phone: "", //手机
+        password: "", //手机
+        code: "" //验证码
       },
       // 表单验证规则绑定
       rules: {
         // trigger主动触发在没有在元素里面使用v-model的情况它是无效的
-        avatar: [{ required: true, message: "请上传头像" }]
+        avatar: [{ required: true, message: "请上传头像", trigger: "change" }],
+        username: [
+          { required: true, message: "请填写昵称", trigger: "change" }
+        ],
+        /*
+        自定义表单校验  
+        validator:(rule,value,callback){
+          rule:规则
+          value:当前校验项的值
+          cal;lback()   
+          通过就callback()
+          不通过callback("错误信息")
+        }
+        */
+
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "change" },
+          {
+            validator: (rule, value, callback) => {
+              // 正则校验
+              let _reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+              if (_reg.test(value)) {
+                callback();
+              } else {
+                callback("请正确输入邮箱地址");
+              }
+            }
+          }
+        ],
+        phone: [
+          { required: true, message: "请输入手机号", trigger: "change" },
+          {
+            validator: (rule, value, callback) => {
+              // 正则校验
+              let _reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+              if (_reg.test(value)) {
+                callback();
+              } else {
+                callback("请正确输入手机号");
+              }
+            }
+          }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "change" },
+          { min: 6, max: 12, message: "请输入6-12位密码", trigger: "change" }
+        ],
+        code: [
+          { required: true, message: "请输入验证码", trigger: "change" },
+          { min: 4, max: 4, message: "请输入4位验证码", trigger: "change" }
+        ]
       },
       baseUrl: process.env.VUE_APP_URL,
-      imageUrl: ""
+      imageUrl: "" //只是纯展示那个图片的地址
     };
   },
   methods: {
@@ -154,6 +239,11 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .code {
+    width: 100%;
+    height: 40px;
+    border: 1px dashed #ccc;
   }
 }
 </style>
