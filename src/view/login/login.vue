@@ -58,7 +58,7 @@
               <el-input v-model="form.code" prefix-icon="el-icon-key" placeholder="请输入验证码"></el-input>
             </el-col>
             <el-col :span="8">
-              <img src="@/assets/img/key.jpg" class="key" alt />
+              <img :src="code" @click="codeClick" class="key" alt />
             </el-col>
           </el-row>
         </el-form-item>
@@ -67,7 +67,7 @@
           v-model默认值可以来一个空字符串，这样的的选择结果就是true/false
           el-link  type决定颜色 
         -->
-        <el-form-item>
+        <el-form-item prop="isCheck">
           <el-checkbox v-model="form.isCheck">
             我已阅读并同意
             <el-link type="primary">用户协议</el-link>和
@@ -100,6 +100,8 @@
 
 <script>
 import register from "./register.vue";
+import { toLogin } from "@/api/login.js";
+import { saveToken } from "@/utils/token.js";
 export default {
   name: "login",
   components: {
@@ -107,6 +109,7 @@ export default {
   },
   data() {
     return {
+      code: process.env.VUE_APP_URL + "/captcha?type=login",
       //表单绑定的值
       form: {
         phone: "", //手机号
@@ -116,7 +119,20 @@ export default {
       },
       //表单验证规则
       rules: {
-        phone: [{ required: true, message: "请输入手机号", trigger: "change" }],
+        phone: [
+          { required: true, message: "请输入手机号", trigger: "change" },
+          {
+            validator: (rule, value, callback) => {
+              // 正则校验
+              let _reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+              if (_reg.test(value)) {
+                callback();
+              } else {
+                callback("请正确输入手机号");
+              }
+            }
+          }
+        ],
         password: [
           { required: true, message: "请输入密码", trigger: "change" },
           {
@@ -134,6 +150,18 @@ export default {
             message: "请正确输入验证码",
             trigger: "change"
           }
+        ],
+        isCheck: [
+          { required: true, message: "请勾选协议", trigger: "change" },
+          {
+            validator: (rule, value, callback) => {
+              if (value === true) {
+                callback();
+              } else {
+                callback("请勾选协议");
+              }
+            }
+          }
         ]
       }
     };
@@ -142,8 +170,17 @@ export default {
   methods: {
     // 登陆点击
     loginClick() {
+      // 登陆全局校验
       this.$refs.form.validate(result => {
-        this.$message.success(result + "");
+        // 登陆接口调用
+        if (result == true) {
+          toLogin(this.form).then(res => {
+            this.$message.success("登陆成功");
+            window.console.log("登陆信息：", res);
+            // 保存token
+            saveToken(res.data.token);
+          });
+        }
       });
     },
     // 注册点击
@@ -152,6 +189,11 @@ export default {
       // 1：在register组件 上定义一个ref属性  ref=值
       //2：通过this.$refs.值.dialogFormVisible=true
       this.$refs.register.dialogFormVisible = true;
+    },
+    //验证码点击切换
+    codeClick() {
+      this.code =
+        process.env.VUE_APP_URL + "/captcha?type=login&t=" + Date.now();
     }
   }
 };
