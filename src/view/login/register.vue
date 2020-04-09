@@ -78,23 +78,27 @@
             <el-input v-model="form.rcode"></el-input>
           </el-col>
           <el-col :span="7" :offset="1">
-            <el-button @click="getRecode">获取验证码</el-button>
+            <el-button @click="getRecode" :disabled="totalTime!=60">
+              获取验证码
+              <span v-if="totalTime!=60">{{totalTime}}</span>
+            </el-button>
           </el-col>
         </el-row>
       </el-form-item>
     </el-form>
     <!-- 加一个确定按钮 -->
     <div slot="footer" class="center">
-      <el-button>取消</el-button>
+      <el-button @click="dialogFormVisible=false">取消</el-button>
       <el-button type="primary" @click="submitClick">确定</el-button>
     </div>
   </el-dialog>
 </template>
 <script>
-import getPhoneCode from "@/api/register.js";
+import { getPhoneCode, register } from "@/api/register.js";
 export default {
   data() {
     return {
+      totalTime: 60,
       dialogFormVisible: false,
       // 图形验证码
       codeUrl: process.env.VUE_APP_URL + "/captcha?type=sendsms",
@@ -172,6 +176,27 @@ export default {
       imageUrl: "" //只是纯展示那个图片的地址
     };
   },
+  // 监听器
+  /*
+  对某个值进行一个监听，如果它改变了，可以对它进行一些相应处理
+  // 只要dialogFormVisible为false了就要清空表单
+  1：放到watch:{}
+  2：写要要监听的值  this.dialogFormVisible
+  3：去掉this把该传转换成字符串 dialogFormVisible
+  4:监听器本质就是一个function (newVal,oldval){}
+     newVal当前值，oldVal修改前一刻的值
+  */
+
+  watch: {
+    dialogFormVisible(newVal) {
+      if (newVal == false) {
+        // 清空表单
+        this.$refs.form.resetFields();
+        // 将图片置空
+        this.imageUrl = "";
+      }
+    }
+  },
   methods: {
     // 上传前处理
     beforeAvatarUpload(file) {
@@ -209,6 +234,15 @@ export default {
       // 1：在el-form上定义一个ref   2:调用el-form上的validate方法
       this.$refs.form.validate(result => {
         window.console.log(result);
+        if (result) {
+          register(this.form).then(res => {
+            window.console.log("注册返回信息", res);
+            // 如果 api封装的好，这个判断 是可以省掉的，如果在响应拦截里面把所有处理都写好了，这里只要能收到数据就是200的数据
+            //
+            this.$message.success("注册成功");
+            this.dialogFormVisible = false;
+          });
+        }
       });
     },
     // 点击切换验证码
@@ -242,12 +276,21 @@ export default {
         //   },
         //   withCredentials: true //跨域照样协带cookie
         // })
+        // 倒计时功能
+        this.totalTime--;
+        let _interval = setInterval(() => {
+          this.totalTime--;
+          if (this.totalTime <= 0) {
+            clearInterval(_interval);
+            this.totalTime = 60;
+          }
+        }, 1000);
         getPhoneCode({
           code: this.form.code,
           phone: this.form.phone
         }).then(res => {
-          this.$message.success(res.data.data.captcha + "");
           window.console.log(res);
+          this.$message.success(res.data.captcha + "");
         });
       }
     }
