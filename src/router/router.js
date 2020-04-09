@@ -17,6 +17,7 @@
 import VueRouter from "vue-router"
 // 导入登陆组件
 import login from '@/view/login/login.vue'
+import layout from '@/view/home/layout.vue'
 // 注册
 import Vue from 'vue'
 Vue.use(VueRouter)
@@ -27,6 +28,10 @@ const router = new VueRouter({
         {
             path: "/",
             component: login
+        },
+        {
+            path: "/home",
+            component: layout
         }
     ]
 })
