@@ -7,7 +7,11 @@
 
 import axios from 'axios'
 import { Message } from 'element-ui';
-import { getToken } from './token.js'
+// 导入token和清理token清理方法
+import { getToken, removeToken } from './token.js'
+import router from "@/router/router.js"
+
+
 var instance = axios.create({
     baseURL: process.env.VUE_APP_URL,   //设置基地址
     withCredentials: true //跨域照样协带cookie
@@ -15,7 +19,7 @@ var instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
-    // 首先得有token我们才加
+    // 首先得有token我们才加，
     if (getToken()) {
         config.headers.token = getToken()
     }
@@ -31,6 +35,15 @@ instance.interceptors.response.use(function (response) {
     if (response.data.code == 200) {
         // 因为返回数据里面axios帮我们额外的包了一层data但实际我们基本不用，所以我们把它干掉
         return response.data;
+    } else if (response.data.code == 206) {
+        // token出错处理
+        Message.error("登陆超时了！")
+        // 清理掉token
+        removeToken()
+        // 跳至登陆页
+        router.push("/")
+        return Promise.reject("error");
+
     } else {
         // 提示用户错误
         // 出错了我们还有必要返回数据出去吗？

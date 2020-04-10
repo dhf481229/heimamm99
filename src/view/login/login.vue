@@ -101,7 +101,7 @@
 <script>
 import register from "./register.vue";
 import { toLogin } from "@/api/login.js";
-import { saveToken } from "@/utils/token.js";
+import { saveToken, getToken } from "@/utils/token.js";
 export default {
   name: "login",
   components: {
@@ -166,6 +166,14 @@ export default {
       }
     };
   },
+  created() {
+    //有token   getToken()为真
+    //没token   getToken()为undefined
+    if (getToken()) {
+      //这里有token,跳到首页
+      this.$router.push("/home");
+    }
+  },
   mounted() {},
   methods: {
     // 登陆点击
@@ -179,6 +187,7 @@ export default {
             window.console.log("登陆信息：", res);
             // 保存token
             saveToken(res.data.token);
+            this.$router.push("/home");
           });
         }
       });
