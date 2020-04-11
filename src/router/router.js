@@ -32,7 +32,11 @@ const router = new VueRouter({
     routes: [
         {
             path: "/",
-            component: login
+            component: login,
+            meta: {
+                //路由元信息，它是一个让我们自己随便定义的一个对象
+                title: "登陆"
+            }
         },
         {
             path: "/home",
@@ -41,23 +45,38 @@ const router = new VueRouter({
             children: [
                 {
                     path: "chart",
-                    component: chart
+                    component: chart,
+                    meta: {
+                        title: "数据概览"
+                    }
                 },
                 {
                     path: "userList",
-                    component: userList
+                    component: userList,
+                    meta: {
+                        title: "用户列表"
+                    }
                 },
                 {
                     path: "question",
-                    component: question
+                    component: question,
+                    meta: {
+                        title: "题库列表"
+                    }
                 },
                 {
                     path: "business",
-                    component: business
+                    component: business,
+                    meta: {
+                        title: "企业列表"
+                    }
                 },
                 {
                     path: "subject",
-                    component: subject
+                    component: subject,
+                    meta: {
+                        title: "学科列表"
+                    }
                 },
             ]
         }
@@ -77,10 +96,10 @@ router.beforeEach((to, from, next) => {
 
 })
 // 进入后守卫
-router.afterEach((to, from) => {
+router.afterEach((to) => {
     // 进度条结束
     NProgress.done()
-    window.console.log(from)
+    document.title = to.meta.title    //to就相当于当前的$route信息
 })
 // 输出 出去
 export default router

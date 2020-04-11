@@ -7,8 +7,8 @@
         <span class="title">黑马面面</span>
       </div>
       <div class="right">
-        <img class="avatar" :src="userInfo.avatar" alt />
-        <span class="name">{{userInfo.username}}，您好</span>
+        <img class="avatar" :src="$store.state.userInfo.avatar" alt />
+        <span class="name">{{$store.state.userInfo.username}}，您好</span>
         <el-button type="primary" @click="exit">退出</el-button>
       </div>
     </el-header>
@@ -85,6 +85,7 @@ export default {
       this.userInfo = res.data;
       this.userInfo.avatar =
         process.env.VUE_APP_URL + "/" + this.userInfo.avatar;
+      this.$store.state.userInfo = this.userInfo;
       window.console.log("用户信息：", res);
     });
   },
