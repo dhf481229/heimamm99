@@ -56,7 +56,7 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
-      <el-main>
+      <el-main class="main">
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -153,6 +153,9 @@ export default {
   .menuTransition:not(.el-menu--collapse) {
     // 初始宽度
     width: 160px;
+  }
+  .main {
+    background-color: #e8e9ec;
   }
 }
 </style>
