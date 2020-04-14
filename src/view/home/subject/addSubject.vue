@@ -10,6 +10,7 @@
     1:el-form   :rules="rules"  
        data里面定义相关的rules:{}
     2:el-form-item把需要校验的项绑定prop
+ 
 
     3:加入全局校验  el-form组件里面的方法 validate
        1：在el-form上定义一个ref属性
@@ -77,7 +78,7 @@ export default {
         // 当第一次打开时form表单都不存在，所以无法调用clearValidate
         // setTimeou高级版本，它会在页面渲染完成后进行调用，它计算好了最近的页面渲染所需时间
         //它计算好了渲染from所需时间后进行调用
-        //处理验证红色问题
+        //处理验证红色问题，也可以通过设置rules里面的trigger为blur就不会有这个问题
         this.$nextTick(() => {
           this.$refs.form.clearValidate();
         });
