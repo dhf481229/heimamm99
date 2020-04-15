@@ -35,7 +35,8 @@ const router = new VueRouter({
             component: login,
             meta: {
                 //路由元信息，它是一个让我们自己随便定义的一个对象
-                title: "登陆"
+                title: "登陆",
+                rules: ["超级管理员", "管理员", "老师", "学生"]
             }
         },
         {
@@ -47,35 +48,45 @@ const router = new VueRouter({
                     path: "chart",
                     component: chart,
                     meta: {
-                        title: "数据概览"
+                        title: "数据概览",
+                        rules: ["超级管理员", "管理员", "老师"],
+                        icon: "el-icon-pie-chart"
                     }
                 },
                 {
                     path: "userList",
                     component: userList,
                     meta: {
-                        title: "用户列表"
+                        title: "用户列表",
+                        rules: ["超级管理员", "管理员"],
+                        icon: "el-icon-user"
                     }
                 },
                 {
                     path: "question",
                     component: question,
                     meta: {
-                        title: "题库列表"
+                        title: "题库列表",
+                        rules: ["超级管理员", "管理员", "老师"],
+                        icon: "el-icon-edit-outline"
                     }
                 },
                 {
                     path: "business",
                     component: business,
                     meta: {
-                        title: "企业列表"
+                        title: "企业列表",
+                        rules: ["超级管理员", "管理员", "老师"],
+                        icon: "el-icon-office-building"
                     }
                 },
                 {
                     path: "subject",
                     component: subject,
                     meta: {
-                        title: "学科列表"
+                        title: "学科列表",
+                        rules: ["超级管理员", "管理员", "老师", "学生"],
+                        icon: "el-icon-notebook-2"
                     }
                 },
             ]
@@ -89,11 +100,28 @@ import NProgress from 'nprogress'
 // 导入nprogress对应css
 import 'nprogress/nprogress.css'
 // css需要导入
+import { Message } from 'element-ui';
+import { removeToken } from "@/utils/token.js"
+import store from "@/store/index.js"
 router.beforeEach((to, from, next) => {
     // 进度条开启
     NProgress.start()
-    next()
-
+    /*
+    to:到哪个路由去
+    from:从哪里过来的
+    next:  next() 正常通过
+          next("path")把你甩到其它地方去    
+    */
+    //to.meta.rules.includes(this.$store.state.role))
+    if (to.meta.rules.includes(store.state.role)) {
+        next()
+    } else {
+        // 弹出提示
+        Message.warning("您无权访问该页面！")
+        // 清除token
+        removeToken()
+        next("/")
+    }
 })
 // 进入后守卫
 router.afterEach((to) => {
